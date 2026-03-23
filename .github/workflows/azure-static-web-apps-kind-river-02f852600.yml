@@ -17,19 +17,23 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write # 允许在 PR 中发送预览 URL 评论
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest # 建议显式指定版本，或缺省使用最新
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Enable pnpm via corepack
-        run: corepack enable
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -37,29 +41,18 @@ jobs:
       - name: Build Fuwari
         run: pnpm build
 
-      - name: Install OIDC Client from Core Package
-        run: npm install @actions/core@1.6.0 @actions/http-client
-
-      - name: Get Id Token
-        uses: actions/github-script@v6
-        id: idtoken
-        with:
-          script: |
-            const coredemo = require('@actions/core')
-            return await coredemo.getIDToken()
-          result-encoding: string
-
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_RIVER_02F852600 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # 推荐：用于在 PR 自动回复预览链接
           action: "upload"
           app_location: "/"
           api_location: ""
           output_location: "dist"
           skip_app_build: true
-          github_id_token: ${{ steps.idtoken.outputs.result }}
+          # 删除了冗余的 github_id_token 字段
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -70,4 +63,6 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
+          # 修复：补充必需的鉴权 Token
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_RIVER_02F852600 }}
           action: "close"
