@@ -20,24 +20,25 @@ jobs:
           submodules: true
           lfs: false
 
-      # 1. 安装 Node.js
+      # 1. 安装 Node.js (Fuwari 推荐使用 Node 18 或 20)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          
-      # 2. 安装 pnpm
+
+      # 2. 安装 pnpm (因为 Fuwari 强制要求 pnpm)
       - uses: pnpm/action-setup@v2
         with:
-          version: 8 # 你项目所使用的 pnpm 版本，建议保持一致
+          version: 8
 
-      # 3. 手动安装依赖并打包
+      # 3. 手动执行安装和打包
+      # 这步完成后，你的项目根目录下会出现一个 dist 文件夹，里面才是真正的网页
       - name: Install dependencies and build
         run: |
           pnpm install
           pnpm run build
 
-      # 4. 部署到 Azure (增加 skip_app_build: true 让它跳过自带构建)
+      # 4. 部署到 Azure
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -45,10 +46,13 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_BLUE_COAST_0FEFF7A00 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/"
-          api_location: ""
-          output_location: "dist" # 依然指向 dist
-          skip_app_build: true # <--- 关键！告诉 Azure 不要再用它自己的 Oryx 给你构建了
+          ###### 关键改动点 ######
+          # 当 skip_app_build 为 true 时，app_location 必须指向打包后的生成目录
+          app_location: "dist" 
+          api_location: "" 
+          output_location: "" # 既然 app_location 已经指向了结果，这里留空即可
+          skip_app_build: true 
+          ###### 结束改动点 ######
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
