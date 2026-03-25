@@ -12,15 +12,13 @@ draft: false
 #####	Pve安装群晖
 - 将下 img 文件上传的 pve
 - 上传完成后在控制台得到文件路径
-``` sh
+``` bash
 target file: /var/lib/vz/template/iso/DS918_7.21-69057______.img
-
 ```
 - pve 宿主机执行：
-``` sh
+``` bash
 qm importdisk <VM ID> <上传文件的绝对路径> local-lvm
 # qm importdisk 103 /var/lib/vz/template/iso/DS918_7.21-69057______.img local-lvm
-
 ```
 - 回到创建的虚拟机页面
 - 选择 `未使用的磁盘` - 编辑

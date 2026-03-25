@@ -12,19 +12,19 @@ draft: false
 #### ubuntu安装ssh
 
 - 更新 Linux 系统的包索引或包列表
-``` sh
+``` bash
 sudo apt update
 ```
 -  安装ssh服务端
-``` sh 
+``` bash
 sudo apt install openssh-server
 ```
 - 配置文件
-``` sh
+``` bash
 sudo vim /etc/ssh/ssh_config
 ```
 - ssh相关服务
-``` sh
+``` bash
 # 重新启动ssh服务
 deng@local:~/桌面$ sudo systemctl restart ssh
 
@@ -38,7 +38,7 @@ deng@local:~/桌面$ sudo systemctl status ssh
 sudo systemctl enable ssh
 ```
 - ufw相关服务(默认即可)
-``` sh
+``` bash
 sudo ufw status 
 sudo ufw enable 
 # 确保防火墙允许服务端口
