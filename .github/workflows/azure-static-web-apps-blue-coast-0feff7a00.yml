@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
       # 2. 安装 pnpm (因为 Fuwari 强制要求 pnpm)
       - uses: pnpm/action-setup@v2
